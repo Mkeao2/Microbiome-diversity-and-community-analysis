@@ -1,0 +1,17 @@
+Statistical Analysis in RStudio
+
+Import data
+  Metadata (.tsv or .txt)
+  Table (.qza)
+  Tree (.qza)
+  Taxonomy (.txt or .qza)
+
+Create phyloseq object
+  Using qza_to_phyloseq or merge_phyloseq to combine your .qza and .txt files
+
+Identify and remove contaminants, blanks, etc.
+  Run the isContaminant function to check for contaminants
+  Check for tag jumping of other contaminants and proportionally remove relative to the counts present in the blanks
+  Prune_samples to remove any blanks, unwanted taxa, etc.
+
+Compute prevalence and abundance and remove any taxa not meeting minimum counts

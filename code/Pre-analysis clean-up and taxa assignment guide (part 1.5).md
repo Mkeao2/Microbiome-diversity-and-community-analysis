@@ -19,8 +19,8 @@ __Assign taxa names to OTU IDS.__
   
 __Note that you have to download everything needed for taxizedb before these steps, which can take awhile!__ 
 
-#Table1 is a wide dataset with OTU, genus or family name ('tax'), and all samples with occurence data. 
-#This gives you taxa names/numbers for your rows and makes a list of unique IDs. 
+#Table1 is a wide dataset with OTU, genus or family name ('tax'), and all samples with occurence data.  
+#This gives you taxa names/numbers for your rows and makes a list of unique IDs.   
 taxnames <- name2taxid(Table1$tax, db="ncbi", out_type = "summary")
 
 #Gets all other taxonomic rank info for your names. 

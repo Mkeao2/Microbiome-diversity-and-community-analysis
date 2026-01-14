@@ -1,22 +1,22 @@
 **Statistical Analysis in RStudio**
 
-__Import data__
-  Metadata (.tsv or .txt)
-  Table (.qza)
-  Tree (.qza)
-  Taxonomy (.txt or .qza)
-
-__Create phyloseq object__
-  Using qza_to_phyloseq or merge_phyloseq to combine your .qza and .txt files
-
-__Identify and remove contaminants, blanks, etc.__
-  Run the isContaminant function to check for contaminants
-  Check for tag jumping of other contaminants and proportionally remove relative to the counts present in the blanks
-
-__Compute prevalence and abundance and remove any taxa not meeting minimum counts__
-
-__Assign taxa names to OTU IDS.__ 
-
+__Import data__  
+  Metadata (.tsv or .txt)  
+  Table (.qza)  
+  Tree (.qza)  
+  Taxonomy (.txt or .qza)  
+  
+__Create phyloseq object__  
+  Using qza_to_phyloseq or merge_phyloseq to combine your .qza and .txt files  
+  
+__Identify and remove contaminants, blanks, etc.__  
+  Run the isContaminant function to check for contaminants  
+  Check for tag jumping of other contaminants and proportionally remove relative to the counts present in the blanks  
+  
+__Compute prevalence and abundance and remove any taxa not meeting minimum counts__  
+  
+__Assign taxa names to OTU IDS.__   
+  
 #Note that you have to download everything needed for taxizedb before these steps, which can take awhile! 
 
 #Table1 is a wide dataset with OTU, genus or family name ('tax'), and all samples with occurence data. 

@@ -16,7 +16,6 @@ An option will pop up asking you to pick a module. Type “1” and press enter.
 **Part 1: Import demultiplexed files**
 	
 When importing single-end reads you will need:  
-
 	1. A manifest file (.tsv or .txt) containing sample identifiers (first column) with absolute paths for forward (second column) reads 	with sequence and quality data (FASTQ). May bootstrap metadata on as well. To get a quick list of all sequence file names go to that 	directory and run ‘ls > ../log.txt’.  
 	
 	2. A batch file (.sh) containing your qiime command (see below). Note that you can change the time and memory request to suit the 		load of file import (check how much memory was used after your job is done so you can change for next time).  

@@ -17,7 +17,7 @@ __Compute prevalence and abundance and remove any taxa not meeting minimum count
   
 __Assign taxa names to OTU IDS.__   
   
-#Note that you have to download everything needed for taxizedb before these steps, which can take awhile! 
+# Note that you have to download everything needed for taxizedb before these steps, which can take awhile! 
 
 #Table1 is a wide dataset with OTU, genus or family name ('tax'), and all samples with occurence data. 
 #This gives you taxa names/numbers for your rows and makes a list of unique IDs. 
@@ -57,8 +57,8 @@ bacteria0.5$sci.name <- trimws(bacteria0.5$sci.name, "l")
 
 bacteria1 <- bacteria0.5 %>% separate(sci.name, c('Genus', 'Species', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11'))
 
-#drop all name columns except genus
-bacteria2 <- bacteria1[-c(2:13)] 
+# Drop all name columns except genus  
+bacteria2 <- bacteria1[-c(2:13)]   
 
 # get rid of rows with non-fungi or bacteria names by getting code list from google doc 
 #(https://docs.google.com/spreadsheets/d/18_1GHXJD3wkQfKAMQJlB0gQbviydswj9-WXNdj1pANc/edit#gid=1489075112)

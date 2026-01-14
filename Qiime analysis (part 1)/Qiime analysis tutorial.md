@@ -1,37 +1,37 @@
-**Microbiome Metabarcoding Workflow for 16S, ITS, and RBCL**
+# Microbiome Metabarcoding Workflow for 16S, ITS, and RBCL  
 
-**Qiime2**
-Download forward reads from dropbox (.fastq)
-If provided by the sequencing company, I1 and I2 are index files. R1 are forward and R2 are reverse reads. We are working with single end reads with only forward paths from Guelph.
-set up Apptainer within the ‘scratch’ directory- This is where all commands should be run from!!  Qiime is now a module that you can load and run in Apptainer (like an environment/container within your linux environment). Run within the working directory and not as a submitted job. The build step only needs to be done once. 
+**Part 1: Set-up Qiime2**
+Download forward reads from dropbox (.fastq)  
+If provided by the sequencing company, I1 and I2 are index files. R1 are forward and R2 are reverse reads. We are working with single end reads with only forward paths to increase sequencing depth.  
+
+Set up Apptainer within the ‘scratch’ directory- This is where all commands should be run from.  Qiime is now a module that you can load and run in Apptainer (like an environment/container within your linux environment). Run within the working directory and not as a submitted job. The build step only needs to be done once. 
 
 **module load apptainer**
 apptainer build qiime2-2021.11.sif docker://quay.io/qiime2/core:2021.11
 An option will pop up asking you to pick a module. Type “1” and press enter. 
 
-Import files (Note: make sure they are already demultiplexed)
+**Part 2: Import demultiplexed files**
 	
-You will need: 
-A manifest file (.tsv or .txt) containing sample identifiers (first column) with absolute paths for forward (second column) reads with sequence and quality data (FASTQ). May bootstrap metadata on as well.	To get a quick list of all sequence file names go to that directory and run ‘ls > ../log.txt’. 
-A batch file (.sh) containing your qiime command (see below). Note that you can change the time and memory request to suit the load of file import (check how much memory was used after your job is done so you can change for next time). 
-A directory containing all the sequencing files you want to import. 
-Using qiime tools import, import and demultiplex the files with Import_Demuliplex_1.py. Note we are using single end reads and the Phred value is 33. 
+When importing single-end reads you will need:  
+	1. A manifest file (.tsv or .txt) containing sample identifiers (first column) with absolute paths for forward (second column) reads 	with sequence and quality data (FASTQ). May bootstrap metadata on as well. To get a quick list of all sequence file names go to that 	directory and run ‘ls > ../log.txt’.  
+	
+	2. A batch file (.sh) containing your qiime command (see below). Note that you can change the time and memory request to suit the 		load of file import (check how much memory was used after your job is done so you can change for next time).  
+	
+	3. A directory containing all the sequencing files you want to import. Using qiime tools import, import and demultiplex the files 		with *Import_Demuliplex_1.sh*. Note we are using single end reads and the Phred value is 33. 
 
+If you need to import paired-end reads instead of single-end check out the tutorial here:https://docs.qiime2.org/2023.9/tutorials/importing/.  
 
-
-
-If you need to import paired-end reads instead of single-end check out the tutorial here:https://docs.qiime2.org/2023.9/tutorials/importing/
-Visualize the result file (.qzv) to get the sequence qualities with Visualize_2.sh. 
+Visualize the result file (.qzv) to get the sequence qualities with *Visualize_2.sh*. 
 
 
 View this file using https://view.qiime2.org/. Determine where to truncate each sequence depending on where there is a drop in quality in the graph under the Interactive Quality Plot tab. If you need help figuring out where to truncate (removing the ‘tail’ of the sequence reading right -> left) and/or trim (removing the ‘head’ of the sequence reading left -> right) see the tutorial at https://docs.qiime2.org/2023.9/tutorials/moving-pictures/.
 
-Run the DADA2 plugin to truncate and/or trim sequences based on the plot created from the prior step with DADA2_trim_3.sh. Note: If you are merging files (like if you did a meta-analysis with multiple datasets or are combining sequencing runs) merge files after this step. Tutorial: https://docs.qiime2.org/2023.9/tutorials/fmt/
+Run the DADA2 plugin to truncate and/or trim sequences based on the plot created from the prior step with *DADA2_trim_3.sh*. Note: If you are merging files (like if you did a meta-analysis with multiple datasets or are combining sequencing runs) merge files after this step. Tutorial: https://docs.qiime2.org/2023.9/tutorials/fmt/
 
 
 
 
-Generate the FeatureTable and FeatureData summary with Feature_Summary_4.sh (Note: command ‘feature-table summarize’ is not necessary unless using the Qiime2 program for stats or for generating plots).
+Generate the FeatureTable and FeatureData summary with *Feature_Summary_4.sh* (Note: command ‘feature-table summarize’ is not necessary unless using the Qiime2 program for stats or for generating plots).
 
 
 

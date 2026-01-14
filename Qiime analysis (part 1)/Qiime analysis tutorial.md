@@ -129,7 +129,8 @@ apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaD
 Visualize OutputFile_dada2.qzv at https://view.qiime2.org/ and download sequences as a fasta file. This will be used for sequence classification. 
 
 
-**Part 5: Classification with BLAST**
+**Part 5: Classification with BLAST**  
+
 The main 3 options when classifying sequences are BLAST, SILVA, and UNITE. We use BLAST because results are largely consistent across databases and BLAST is the most user-friendly. 
 
 __BLAST__  
@@ -168,7 +169,12 @@ Combine the reference sequence files from the array using this command in scratc
 cat seq.ref.{0..9} > seq.ref
 ```
 
-Use the export command to export theOutputFileTable-dada2.qza. 
+
+**Part 6: Export data**  
+
+Use *Export_data_6.sh* to export theOutputFileTable-dada2.qza. 
+
+```
 #!/bin/bash
 #SBATCH --account=def-sanrehan
 #SBATCH --time=00:10:00
@@ -181,19 +187,27 @@ module load StdEnv/2020 gcc/9.3.0 apptainer
 apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaData:/MetaData qimme2.sif qiime tools export \
 --input-path /temp/quality_files/OutputFileTable-dada2.qza
 --output-path /temp/exported-feature-table
-Now transform the .biom file in the new directory to a text file. 
+```  
 
-Use  source env-biom/bin/activate to open your env-biom environment.
+Next, set up your env-biom environment (only needs to be done once). 
 
-NOTE: before you run the biom convert script for the first time you need to set up your env-biom environment. 
-
+```
 module load python/3.10.2
 virtualenv env-biom
 source env-biom/bin/activate
 pip install -no-index --upgrade pip
 pip install --no-index biom_format
+```
 
+Now transform the .biom file in the new directory to a text file. Run the following to open your env-biom environment.  
 
+```
+source env-biom/bin/activate
+```
+
+You may now use *Biom_convert_7.sh* to convert a .biom file to a text file.
+
+```
 #!/bin/bash
 #SBATCH --account=def-sanrehan
 #SBATCH --time=00:10:00
@@ -204,68 +218,10 @@ module load StdEnv/2023 gcc/12.3 r-bundle-bioconductor/3.18
 
 
 biom convert -i newtable.biom -o new.biomtable.txt --to-tsv
-This file can now be used to match OTU IDs to corresponding samples. 
+```
+
+This file can now be used to match OTU IDs to corresponding samples in excel or R.  
 
 
 The quickest way to combine files is to open the seq.ref file in excel, use find and replace to remove everything other than OTU query and taxa names, and split text-to-columns. Next, copy and paste the query ID and taxa name columns to the new.biomtable.txt file in excel (seperate text-to-columns in this file if needed). Finally, use VLOOKUP in a new column to match OTU IDs to their taxa names. You now have a table of taxa IDs and sample names!
-
-__SILVA__
-
-Life Hack: Use the pre-trained classifiers from Qiime2 developers: https://docs.qiime2.org/2022.2/data-resources/ . While noted as a security risk and that classifiers perform best using your specific samples, I found that the Naïve Bayes classification using the pre-trained classifier worked just as well. Use at your own risk.
-Otherwise follow these steps https://docs.qiime2.org/2022.2/tutorials/feature-classifier/
-Import sequences (.fasta) and taxonomy (.txt) from SILVA
-qiime tools import \
-  --type 'FeatureData[Sequence]' \
-  --input-path 85_otus.fasta \
-  --output-path 85_otus.qza
-
-
-qiime tools import \
-  --type 'FeatureData[Taxonomy]' \
-  --input-format HeaderlessTSVTaxonomyFormat \
-  --input-path 85_otu_taxonomy.txt \
-  --output-path ref-taxonomy.qza
-
-Extract reference reads using the length of your reads (120) and the primers used.
-qiime feature-classifier extract-reads \
-  --i-sequences 85_otus.qza \
-  --p-f-primer GTGCCAGCMGCCGCGGTAA \
-  --p-r-primer GGACTACHVGGGTWTCTAAT \
-  --p-trunc-len 120 \
-  --p-min-length 100 \
-  --p-max-length 400 \
-  --o-reads ref-seqs.qza
-
-Train classifier using the reference reads and reference taxonomy
-qiime feature-classifier fit-classifier-naive-bayes \
-  --i-reference-reads ref-seqs.qza \
-  --i-reference-taxonomy ref-taxonomy.qza \
-  --o-classifier classifier.qza
-
-Test the classifier
-qiime feature-classifier classify-sklearn \
-  --i-classifier classifier.qza \
-  --i-reads rep-seqs.qza \
-  --o-classification taxonomy.qza
-
-
-qiime metadata tabulate \
-  --m-input-file taxonomy.qza \
-  --o-visualization taxonomy.qzv
-References
-Michael S Robeson II, Devon R O’Rourke, Benjamin D Kaehler, Michal Ziemski, Matthew R Dillon, Jeffrey T Foster, Nicholas A Bokulich. RESCRIPt: Reproducible sequence taxonomy reference database management for the masses. bioRxiv 2020.10.05.326504; doi: https://doi.org/10.1101/2020.10.05.326504
-Bokulich, N.A., Kaehler, B.D., Rideout, J.R. et al. Optimizing taxonomic classification of marker-gene amplicon sequences with QIIME 2’s q2-feature-classifier plugin. Microbiome 6, 90 (2018). https://doi.org/10.1186/s40168-018-0470-z
-
-__UNITE__
-
-Using a very similar process to SILVA, repeat the process with the UNITE classifier. Exclude the step involving extracting reference reads. https://john-quensen.com/tutorials/training-the-qiime2-classifier-with-unite-its-reference-sequences/ 
-Reference
-Abarenkov, Kessy; Zirk, Allan; Piirmann, Timo; Pöhönen, Raivo; Ivanov, Filipp; Nilsson, R. Henrik; Kõljalg, Urmas (2021): UNITE QIIME release for Fungi 2. UNITE Community. 10.15156/BIO/1264763
-Megan
-Install the Megan6 software onto your computer and download the latest genomic database from their website
-The BLAST output will have to be a standard output format (such as outfmt 6 for tabular format) without any adjustments to the output
-Under “Import from BLAST”, upload the reference sequences (.txt), the reads file (.qza), and the downloaded genomic database from their website
-Export the taxonomy into your desired output. Viewing in Excel (.csv) is one easy way if a manual comparison to the BLAST output is to be done
-Reference
-D.H. Huson et al, MEGAN Community Edition - Interactive exploration and 2 analysis of large-scale microbiome sequencing data, PLoS Computational Biology 12(6): e1004957. doi:10.1371/journal. pcbi.100495 [11]
 

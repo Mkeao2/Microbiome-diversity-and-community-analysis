@@ -1,2 +1,3 @@
-The following code is for the paper "Wild bee microbiome diversity and community composition are influenced by bee phylogeny, plant choice, and urban intensity.", in preparation. 
+The following tutorial and code is for the paper "Wild bee microbiome diversity and community composition are influenced by bee phylogeny, plant choice, and urban intensity.", in preparation. 
+
 Data not yet publically available.

@@ -22,20 +22,94 @@ When importing single-end reads you will need:
 *Import_Demuliplex_1.sh* 
 
 ```
+#!/bin/bash
+#SBATCH --account=def-sanrehan
+#SBATCH --time=00:20:00
+#SBATCH --mem=7GB
+
+
+module load StdEnv/2020 gcc/9.3.0 apptainer
+
+
+apptainer run -B /scratch/UserID:/temp -B /lustre06/project/6048691/UserID/Pathto:/SeqFilesDirectory qimme2.sif qiime tools import \
+ --type 'SampleData[SequencesWithQuality]' \
+ --input-path /temp/PathTo/ManifestFileName.tsv  \
+ --output-path /temp/OutputFileName.qza \
+ --input-format SingleEndFastqManifestPhred33V2
+```
 
 If you need to import paired-end reads instead of single-end check out the tutorial here:https://docs.qiime2.org/2023.9/tutorials/importing/.  
 
 Visualize the result file (.qzv) to get the sequence qualities with *Visualize_2.sh*. 
 
+```
+#!/bin/bash
+#SBATCH --account=def-sanrehan
+#SBATCH --time=00:05:00
+#SBATCH --mem=7GB
+
+
+module load StdEnv/2020 gcc/9.3.0 apptainer
+
+
+apptainer run -B /scratch/UserID:/temp -B /lustre06/project/6048691/UserID/Directorywithseqfiles/Directorywithseqfiles qimme2.sif qiime demux summarize \
+--i-data /temp/reads_files/InputFileName.qza \
+--output-dir /temp/OutputFileName.qzv
+```
 
 View this file using https://view.qiime2.org/. Determine where to truncate each sequence depending on where there is a drop in quality in the graph under the Interactive Quality Plot tab. If you need help figuring out where to truncate (removing the ‘tail’ of the sequence reading right -> left) and/or trim (removing the ‘head’ of the sequence reading left -> right) see the tutorial at https://docs.qiime2.org/2023.9/tutorials/moving-pictures/.
 
 Run the DADA2 plugin to truncate and/or trim sequences based on the plot created from the prior step with *DADA2_trim_3.sh*. Note: If you are merging files (like if you did a meta-analysis with multiple datasets or are combining sequencing runs) merge files after this step. Tutorial: https://docs.qiime2.org/2023.9/tutorials/fmt/
 
+```
+#!/bin/bash
+#SBATCH --account=def-sanrehan
+#SBATCH --time=00:20:00
+#SBATCH --mem=5G
 
 
+module load StdEnv/2020 gcc/9.3.0 apptainer
+
+
+apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaData:/MetaData qimme2.sif qiime dada2 denoise-single \
+
+
+--i-demultiplexed-seqs /temp/PathTo/InputFileName.qza \
+--p-trunc-len 175 \
+--p-trim-left 8 \
+--o-representative-sequences /temp/PathTo/OutputFile_dada2.qza \
+--o-table /temp/PathTo/OutputFileTable-dada2.qza \
+--o-denoising-stats /temp/PathTo/OutputFileStats-dada2.qza \
+--verbose
+```
 
 Generate the FeatureTable and FeatureData summary with *Feature_Summary_4.sh* (Note: command ‘feature-table summarize’ is not necessary unless using the Qiime2 program for stats or for generating plots).
+
+```
+#!/bin/bash
+#SBATCH --account=def-sanrehan
+#SBATCH --time=00:20:00
+#SBATCH --mem=5G
+
+
+module load StdEnv/2020 gcc/9.3.0 apptainer
+
+
+apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaDataDirectory :/MetaDataDirectory qimme2.sif qiime feature-table summarize \
+--i-table OutputFileTable-dada2.qza \
+--o-visualization OutputFileTable-dada2.qzv \
+--m-sample-metadata-file sample-metadata.tsv
+
+
+apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaDataDirectory :/MetaDataDirectory qimme2.sif qiime feature-table tabulate-seqs \
+--i-data OutputFile_dada2.qza \
+--o-visualization OutputFile_dada2.qzv \ 
+
+
+apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaData:/MetaData qimme2.sif qiime metadata tabulate \
+--m-input-file OutputFileStats-dada2.qza
+--o-visualization OutputFileStats-dada2.qzv
+```
 
 
 

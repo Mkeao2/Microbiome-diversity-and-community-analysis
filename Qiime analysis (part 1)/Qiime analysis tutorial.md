@@ -133,16 +133,14 @@ Visualize OutputFile_dada2.qzv at https://view.qiime2.org/ and download sequence
 
 The main 3 options when classifying sequences are BLAST, SILVA, and UNITE. We use BLAST because results are largely consistent across databases and BLAST is the most user-friendly. 
 
-__BLAST__  
-
-Using the faSplit utility, divide the sequences.fasta file downloaded in the prior step  into 10 (adjust as necessary) smaller files that will speed up the BLAST search. The new files will be seq(00-09).fa. This code can be run directly and does not require a batch script. 
+Using the faSplit utility, divide the sequences.fasta file downloaded in the prior step  into 10 (adjust as necessary) smaller files that will speed up the BLAST search. The new files will be seq(00-09).fa. 
 
 ```
 module load kentutils
 faSplit sequence sequences.fasta 10 seq
 ```
 
-The sequences can now be BLASTed against the built-in database or a new database can be downloaded from NCBI. To use the available database, run *BLAST_database_search_5.sh*. 
+The sequences can now be BLASTed against the built-in database or a new database can be downloaded from NCBI. To use the available database, use *BLAST_database_search_5.sh*. 
 
 *BLAST_database_search_5.sh*
 

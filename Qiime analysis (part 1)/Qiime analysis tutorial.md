@@ -1,6 +1,7 @@
 # Microbiome Metabarcoding Workflow for 16S, ITS, and RBCL  
 
-**Part 1: Set-up Qiime2**
+**Part 0: Set-up Qiime2**  
+
 Download forward reads from dropbox (.fastq)  
 If provided by the sequencing company, I1 and I2 are index files. R1 are forward and R2 are reverse reads. We are working with single end reads with only forward paths to increase sequencing depth.  
 
@@ -12,7 +13,7 @@ Load the apptainer module
 
 An option will pop up asking you to pick a module. Type “1” and press enter. 
 
-**Part 2: Import demultiplexed files**
+**Part 1: Import demultiplexed files**
 	
 When importing single-end reads you will need:  
 	1. A manifest file (.tsv or .txt) containing sample identifiers (first column) with absolute paths for forward (second column) reads 	with sequence and quality data (FASTQ). May bootstrap metadata on as well. To get a quick list of all sequence file names go to that 	directory and run ‘ls > ../log.txt’.  
@@ -40,7 +41,11 @@ apptainer run -B /scratch/UserID:/temp -B /lustre06/project/6048691/UserID/Patht
 
 If you need to import paired-end reads instead of single-end check out the tutorial here:https://docs.qiime2.org/2023.9/tutorials/importing/.  
 
-Visualize the result file (.qzv) to get the sequence qualities with *Visualize_2.sh*. 
+**Part 2: Visualize sequence quality**  
+
+Visualize the results file (.qzv) to get the sequence quality with *Visualize_2.sh*.  
+
+*Visualize_2.sh*  
 
 ```
 #!/bin/bash
@@ -59,7 +64,11 @@ apptainer run -B /scratch/UserID:/temp -B /lustre06/project/6048691/UserID/Direc
 
 View this file using https://view.qiime2.org/. Determine where to truncate each sequence depending on where there is a drop in quality in the graph under the Interactive Quality Plot tab. If you need help figuring out where to truncate (removing the ‘tail’ of the sequence reading right -> left) and/or trim (removing the ‘head’ of the sequence reading left -> right) see the tutorial at https://docs.qiime2.org/2023.9/tutorials/moving-pictures/.
 
+**Part 2: Trim and truncate sequences**  
+
 Run the DADA2 plugin to truncate and/or trim sequences based on the plot created from the prior step with *DADA2_trim_3.sh*. Note: If you are merging files (like if you did a meta-analysis with multiple datasets or are combining sequencing runs) merge files after this step. Tutorial: https://docs.qiime2.org/2023.9/tutorials/fmt/
+
+*DADA2_trim_3.sh*  
 
 ```
 #!/bin/bash
@@ -82,8 +91,11 @@ apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaD
 --o-denoising-stats /temp/PathTo/OutputFileStats-dada2.qza \
 --verbose
 ```
+**Part 4: Produce data summary**  
 
 Generate the FeatureTable and FeatureData summary with *Feature_Summary_4.sh* (Note: command ‘feature-table summarize’ is not necessary unless using the Qiime2 program for stats or for generating plots).
+
+*Feature_Summary_4.sh*
 
 ```
 #!/bin/bash
@@ -110,8 +122,6 @@ apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaD
 --m-input-file OutputFileStats-dada2.qza
 --o-visualization OutputFileStats-dada2.qzv
 ```
-
-
 
 Visualize OutputFile_dada2.qzv at https://view.qiime2.org/ and download sequences as a fasta file. This will be used for sequence classification. 
 

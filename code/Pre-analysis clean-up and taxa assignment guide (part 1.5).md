@@ -59,37 +59,37 @@ __Note that you have to download everything needed for taxizedb before these ste
 
 bacteria1 <- bacteria0.5 %>% separate(sci.name, c('Genus', 'Species', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11'))
 
-# Drop all name columns except genus  
-bacteria2 <- bacteria1[-c(2:13)]   
+#drop all name columns except genus  
+  bacteria2 <- bacteria1[-c(2:13)]   
 
-# get rid of rows with non-fungi or bacteria names by getting code list from google doc 
+#get rid of rows with non-fungi or bacteria names by getting code list from google doc 
 #(https://docs.google.com/spreadsheets/d/18_1GHXJD3wkQfKAMQJlB0gQbviydswj9-WXNdj1pANc/edit#gid=1489075112)
-#first make list of unique genera, then upload .txt file to NCBI taxonomy to get quick list of everything in the wrong kingdom. 
-list_samples <- unique(bacteria2$Genus)
-unique_genera <- as.data.frame(list_samples)
-write.csv2(unique_genera, "unique_genera.txt")
+#first make list of unique genera, then upload .txt file to NCBI taxonomy to get quick list of everything in the wrong kingdom.  
 
-# example sequence: 
-bacteria2=bacteria2[!grepl("organism",bacteria2$Genus),]
+  list_samples <- unique(bacteria2$Genus)
+  unique_genera <- as.data.frame(list_samples)
+  write.csv2(unique_genera, "unique_genera.txt")
+
+#example sequence: 
+  bacteria2=bacteria2[!grepl("organism",bacteria2$Genus),]
 
 #group samples by sample name (variable) and then sum values for each sample.
-bacteria3 <- bacteria2 %>% group_by(variable) %>% mutate(Total_Sample_Reads = sum(value))
+  bacteria3 <- bacteria2 %>% group_by(variable) %>% mutate(Total_Sample_Reads = sum(value))
 
 #group samples by sample name (variable) and genus, then sum values to get total for each genus in a sample.
-bacteria4 <- bacteria3 %>% group_by(variable, Genus) %>% mutate(Sample_genus_reads = sum(value))
+  bacteria4 <- bacteria3 %>% group_by(variable, Genus) %>% mutate(Sample_genus_reads = sum(value))
 
 #bring forward samples with more than 500 reads and genera with more than 0 reads
-bacteria5 <- bacteria4[bacteria4$Total_Sample_Reads > 500, ]
-bacteria6 <- bacteria5[bacteria5$value > 0, ]
+  bacteria5 <- bacteria4[bacteria4$Total_Sample_Reads > 500, ]
+  bacteria6 <- bacteria5[bacteria5$value > 0, ]
 
 #get proportion of each genus per sample
-bacteria7 <- bacteria6 %>% mutate(Proportion = Sample_genus_reads/Total_Sample_Reads)
+  bacteria7 <- bacteria6 %>% mutate(Proportion = Sample_genus_reads/Total_Sample_Reads)
 
 #bring forward proportions over .01
-bacteria8 <- bacteria7[bacteria7$Proportion > .01, ]
+  bacteria8 <- bacteria7[bacteria7$Proportion > .01, ]
 
-#check sample number to see if any were lost, can also check unique genera to 
-#make sure nothing weird made it through the filter. If genera that need to be removed show up
-# GO BACK TO STEP 0 TO REMOVE!! Must re-run code after removal or read counts will be funky. 
+#check sample number to see if any were lost, can also check unique genera to make sure nothing weird made it through the filter. If genera that need to be removed show up.
+#GO BACK TO STEP 0 TO REMOVE!! Must re-run code after removal or read counts will be funky. 
 
 Prune_samples to remove any blanks, unwanted taxa, etc.

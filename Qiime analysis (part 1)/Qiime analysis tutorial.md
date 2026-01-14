@@ -67,7 +67,7 @@ apptainer run -B /scratch/UserID:/temp -B /lustre06/project/6048691/UserID/Direc
 
 View this file using https://view.qiime2.org/. Determine where to truncate each sequence depending on where there is a drop in quality in the graph under the Interactive Quality Plot tab. If you need help figuring out where to truncate (removing the ‘tail’ of the sequence reading right -> left) and/or trim (removing the ‘head’ of the sequence reading left -> right) see the tutorial at https://docs.qiime2.org/2023.9/tutorials/moving-pictures/.
 
-**Part 2: Trim and truncate sequences**  
+**Part 3: Trim and truncate sequences**  
 
 Run the DADA2 plugin to truncate and/or trim sequences based on the plot created from the prior step with *DADA2_trim_3.sh*. Note: If you are merging files (like if you did a meta-analysis with multiple datasets or are combining sequencing runs) merge files after this step. Tutorial: https://docs.qiime2.org/2023.9/tutorials/fmt/
 
@@ -129,13 +129,23 @@ apptainer run -B /scratch/mkc206:/temp -B /lustre06/project/6048691/mkc206/MetaD
 Visualize OutputFile_dada2.qzv at https://view.qiime2.org/ and download sequences as a fasta file. This will be used for sequence classification. 
 
 
-**Classification**
-The main 3 options when classifying sequences are BLAST, SILVA, and UNITE. Cindy used all 3 for past papers to compare results and has gotten the same across all 3. Makaylee has only used BLAST as it is the easiest of the 3 to get working. Consider algorithms and database options as they are pertinent to your project/data. 
-__BLAST__
+**Part 5: Classification with BLAST**
+The main 3 options when classifying sequences are BLAST, SILVA, and UNITE. We use BLAST because results are largely consistent across databases and BLAST is the most user-friendly. 
+
+__BLAST__  
+
 Using the faSplit utility, divide the sequences.fasta file downloaded in the prior step  into 10 (adjust as necessary) smaller files that will speed up the BLAST search. The new files will be seq(00-09).fa. This code can be run directly and does not require a batch script. 
+
+```
 module load kentutils
 faSplit sequence sequences.fasta 10 seq
-The sequences can now be BLASTed against the built-in database or a new database can be downloaded from NCBI. To use the available database, run the script below. 
+```
+
+The sequences can now be BLASTed against the built-in database or a new database can be downloaded from NCBI. To use the available database, run *BLAST_database_search_5.sh*. 
+
+*BLAST_database_search_5.sh*
+
+```
 #!/bin/bash
 #SBATCH --account=def-sanrehan # The account to use
 #SBATCH --time=24:00:00 # The duration in HH:MM:SS format of ea
@@ -150,11 +160,13 @@ module load StdEnv/2023 gcc/12.3 blast+/2.14.1
 blastn -outfmt "7 qseqid qacc sseqid sacc pident length mismatch gapopen staxids sscinames scomnames" -max_hsps 1 -max_target_seqs 1 -perc_identity 80 \
 -db /cvmfs/ref.mugqic/genomes/blast_db/nt -query filename.seq0${SLURM_ARRAY_TASK_ID}.fa -out filename.ref.${SLURM_ARRAY_TASK_ID}
 
+```
+
 Combine the reference sequence files from the array using this command in scratch. This file can be viewed to see which OTUs match which microbial taxa. Save this file and proceed to the next step to export your sequences that correspond with this file!
 
+```
 cat seq.ref.{0..9} > seq.ref
-
-
+```
 
 Use the export command to export theOutputFileTable-dada2.qza. 
 #!/bin/bash

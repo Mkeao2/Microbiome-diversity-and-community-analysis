@@ -19,6 +19,10 @@ When importing single-end reads you will need:
 	2. A batch file (.sh) containing your qiime command (see below). Note that you can change the time and memory request to suit the 		load of file import (check how much memory was used after your job is done so you can change for next time).  
 	3. A directory containing all the sequencing files you want to import. Using qiime tools import, import and demultiplex the files 		with *Import_Demuliplex_1.sh*. Note we are using single end reads and the Phred value is 33. 
 
+*Import_Demuliplex_1.sh* 
+
+```
+
 If you need to import paired-end reads instead of single-end check out the tutorial here:https://docs.qiime2.org/2023.9/tutorials/importing/.  
 
 Visualize the result file (.qzv) to get the sequence qualities with *Visualize_2.sh*. 

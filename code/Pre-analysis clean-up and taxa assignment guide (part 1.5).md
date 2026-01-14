@@ -70,26 +70,33 @@ bacteria1 <- bacteria0.5 %>% separate(sci.name, c('Genus', 'Species', 'X1', 'X2'
   unique_genera <- as.data.frame(list_samples)  
   write.csv2(unique_genera, "unique_genera.txt")  
 
-#example sequence: 
+#example sequence:  
+
   bacteria2=bacteria2[!grepl("organism",bacteria2$Genus),]
 
-#group samples by sample name (variable) and then sum values for each sample.
+#group samples by sample name (variable) and then sum values for each sample.  
+
   bacteria3 <- bacteria2 %>% group_by(variable) %>% mutate(Total_Sample_Reads = sum(value))
 
-#group samples by sample name (variable) and genus, then sum values to get total for each genus in a sample.
+#group samples by sample name (variable) and genus, then sum values to get total for each genus in a sample.  
+
   bacteria4 <- bacteria3 %>% group_by(variable, Genus) %>% mutate(Sample_genus_reads = sum(value))
 
-#bring forward samples with more than 500 reads and genera with more than 0 reads
+#bring forward samples with more than 500 reads and genera with more than 0 reads  
+
   bacteria5 <- bacteria4[bacteria4$Total_Sample_Reads > 500, ]
   bacteria6 <- bacteria5[bacteria5$value > 0, ]
 
-#get proportion of each genus per sample
+#get proportion of each genus per sample  
+
   bacteria7 <- bacteria6 %>% mutate(Proportion = Sample_genus_reads/Total_Sample_Reads)
 
-#bring forward proportions over .01
+#bring forward proportions over .01  
+
   bacteria8 <- bacteria7[bacteria7$Proportion > .01, ]
 
-#check sample number to see if any were lost, can also check unique genera to make sure nothing weird made it through the filter. If genera that need to be removed show up.
+#check sample number to see if any were lost, can also check unique genera to make sure nothing weird made it through the filter. If genera that need to be removed show up.  
+
 #GO BACK TO STEP 0 TO REMOVE!! Must re-run code after removal or read counts will be funky. 
 
 Prune_samples to remove any blanks, unwanted taxa, etc.

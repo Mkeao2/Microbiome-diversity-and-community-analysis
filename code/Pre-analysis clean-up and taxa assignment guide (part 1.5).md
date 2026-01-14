@@ -21,36 +21,38 @@ __Note that you have to download everything needed for taxizedb before these ste
 
 #Table1 is a wide dataset with OTU, genus or family name ('tax'), and all samples with occurence data.  
 #This gives you taxa names/numbers for your rows and makes a list of unique IDs.   
-taxnames <- name2taxid(Table1$tax, db="ncbi", out_type = "summary")
+
+  taxnames <- name2taxid(Table1$tax, db="ncbi", out_type = "summary")
 
 #Gets all other taxonomic rank info for your names. 
-taxa <- classification(taxnames$id, db="ncbi")
+
+  taxa <- classification(taxnames$id, db="ncbi")
 
 #Changes from a classification object to a data frame/ table
-taxa_wide <- lapply(taxa, function(x) {
-  tidyr::pivot_wider(
-    x[,1:2],
-    names_from = rank,
-    values_from = name,
-    values_fn = function(x) paste(x, collapse = "|"))
-})
+  taxa_wide <- lapply(taxa, function(x) {
+    tidyr::pivot_wider(
+      x[,1:2],
+      names_from = rank,
+      values_from = name,
+      values_fn = function(x) paste(x, collapse = "|"))
+  })
 
-tbl <- dplyr::bind_rows(taxa_wide)
+  tbl <- dplyr::bind_rows(taxa_wide)
 
-#make wide data long
-bacteria <- melt(bact)
-bacteria0 <- bacteria
+#make wide data long  
+
+  bacteria <- melt(bact)
+  bacteria0 <- bacteria
 
 #remove character strings that you don't want - for example, the word "uncultured". We do 
-#this rather than removing the whole row because we still want to keep the genus name following
-#this string. 
+#this rather than removing the whole row because we still want to keep the genus name following this string. 
 
-bacteria0$sci.name <- gsub("uncultured","",as.character(bacteria$sci.name))
+  bacteria0$sci.name <- gsub("uncultured","",as.character(bacteria$sci.name))
 
 #remove spaces at the beginning of rows we removed "uncultured" from
 
-bacteria0.5 <- bacteria0
-bacteria0.5$sci.name <- trimws(bacteria0.5$sci.name, "l")
+  bacteria0.5 <- bacteria0
+  bacteria0.5$sci.name <- trimws(bacteria0.5$sci.name, "l")
 
 #split names column into multiple columns, remove all but first. Make sure you have enough new columns that additional pieces/rows are not discarded.
 #This makes it so that species from the same genera can be combined into one sample count. 

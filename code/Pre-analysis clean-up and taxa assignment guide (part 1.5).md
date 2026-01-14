@@ -1,4 +1,4 @@
-**Statistical Analysis in RStudio**
+# Statistical Analysis in RStudio  
 
 __Import data__  
   Metadata (.tsv or .txt)  
@@ -17,7 +17,7 @@ __Compute prevalence and abundance and remove any taxa not meeting minimum count
   
 __Assign taxa names to OTU IDS.__   
   
-# Note that you have to download everything needed for taxizedb before these steps, which can take awhile! 
+__Note that you have to download everything needed for taxizedb before these steps, which can take awhile!__ 
 
 #Table1 is a wide dataset with OTU, genus or family name ('tax'), and all samples with occurence data. 
 #This gives you taxa names/numbers for your rows and makes a list of unique IDs. 
